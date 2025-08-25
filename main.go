@@ -10,19 +10,16 @@ import (
 type App struct {
 	Url			string
 	Menu		*Menu
-	View		string
-	Views		[]string
+	View		*gocui.View
+	Views		[]*gocui.View
 	Response	*http.Response
 	Error		string
 }
 
 func main() {
-
 	app := App{
 		Url: "http://127.0.0.1:8000/",
 		Menu: getMenu(),
-		View: "menu",
-		Views: []string{"menu", "body",},
 	}
 
 	f, err := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
@@ -43,11 +40,19 @@ func main() {
 	g.SelFgColor = gocui.ColorGreen
 	g.SelFrameColor = gocui.ColorGreen
 	
-	g.SetManagerFunc(app.mainLayout)
-	
+	g.SetManagerFunc(app.defineLayouts)
+	err = app.defineWindows(g)
+	if err != nil {
+		log.Fatalf("Error set layout settings: %v", err)
+	}
+		
 	err = app.keyBindings(g)
 	if err != nil {
 		log.Fatalf("Error key bindings: %v", err)
+	}
+
+	for _, v := range app.Views {
+		log.Print(v.Name())
 	}
 
 	err = g.MainLoop()

@@ -2,6 +2,12 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"log"
+)
+
+const (
+	menu = "menu"
+	editConnection = "editConnection"
 )
 
 func (app *App) keyBindings(g *gocui.Gui) (err error) {
@@ -21,6 +27,11 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
+	err = g.SetKeybinding("header", 'e', gocui.ModNone, app.editConnection)
+	if err != nil {
+		return
+	}
+
 	err = g.SetKeybinding("menu", gocui.KeyArrowUp, gocui.ModNone, moveUp)
 	if err != nil {
 		return
@@ -36,7 +47,53 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
+	err = g.SetKeybinding("editConnection", gocui.KeyEnter, gocui.ModNone, app.editConnectionSave)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding("editConnection", gocui.KeyEsc, gocui.ModNone, app.editConnectionCancel)
+	if err != nil {
+		return
+	}
+
 	return
+}
+
+func (app *App) editConnection(g *gocui.Gui, v *gocui.View) error {
+	view, err := g.View(editConnection)
+	if err != nil || view == nil {
+		return err
+	}
+	view.SetWritePos(0, len(" Server address: "))
+	view.Visible = true
+	app.View = view
+	g.SetViewOnTop(editConnection)
+	g.SetCurrentView(editConnection)
+	log.Printf("View: %s, %v", view.Name(), view.Visible)
+	return nil
+}
+
+func (app *App) editConnectionSave(g *gocui.Gui, v *gocui.View) error {
+	app.View.Visible = false
+	menuView, err := g.View("menu")
+	if err != nil {
+		return err
+	}
+	app.View = menuView
+	g.SetCurrentView(menuView.Name())
+	return nil
+}
+
+func (app *App) editConnectionCancel(g *gocui.Gui, v *gocui.View) error {
+	app.View.Visible = false
+	menuView, err := g.View("menu")
+	if err != nil {
+		return err
+	}
+	app.View = menuView
+	g.SetCurrentView(menuView.Name())
+	return nil
 }
 
 func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
@@ -83,20 +140,12 @@ func moveDown(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (app *App) switchView(g *gocui.Gui, v *gocui.View) (err error) {
-	for i, j := range app.Views {
-		if j != app.View {
-			continue
-		}
-		
-		if i < len(app.Views) - 1 {
-			app.View = app.Views[i + 1]
-		} else {
-			app.View = app.Views[0]
-		}
-
-		break
+	newView, err := app.getNextView()
+	if err != nil {
+		return err
 	}
 
+	app.View = newView
 	return
 }
 
