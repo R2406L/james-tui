@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	body = "body"
+	header = "header"
 	menu = "menu"
 	editConnection = "editConnection"
 )
@@ -27,32 +29,42 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
-	err = g.SetKeybinding("header", 'e', gocui.ModNone, app.editConnection)
+	err = g.SetKeybinding(header, 'e', gocui.ModNone, app.editConnection)
 	if err != nil {
 		return
 	}
 
-	err = g.SetKeybinding("menu", gocui.KeyArrowUp, gocui.ModNone, moveUp)
+	err = g.SetKeybinding(body, gocui.KeyArrowUp, gocui.ModNone, moveBodyUp)
 	if err != nil {
 		return
 	}
 
-	err = g.SetKeybinding("menu", gocui.KeyArrowDown, gocui.ModNone, moveDown)
+	err = g.SetKeybinding(body, gocui.KeyArrowDown, gocui.ModNone, moveBodyDown)
 	if err != nil {
 		return
 	}
 
-	err = g.SetKeybinding("menu", gocui.KeyEnter, gocui.ModNone, app.enter)
+	err = g.SetKeybinding(menu, gocui.KeyArrowUp, gocui.ModNone, moveUp)
 	if err != nil {
 		return
 	}
 
-	err = g.SetKeybinding("editConnection", gocui.KeyEnter, gocui.ModNone, app.editConnectionSave)
+	err = g.SetKeybinding(menu, gocui.KeyArrowDown, gocui.ModNone, moveDown)
 	if err != nil {
 		return
 	}
 
-	err = g.SetKeybinding("editConnection", gocui.KeyEsc, gocui.ModNone, app.editConnectionCancel)
+	err = g.SetKeybinding(menu, gocui.KeyEnter, gocui.ModNone, app.enter)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding(editConnection, gocui.KeyEnter, gocui.ModNone, app.editConnectionSave)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding(editConnection, gocui.KeyEsc, gocui.ModNone, app.editConnectionCancel)
 	if err != nil {
 		return
 	}
@@ -108,14 +120,21 @@ func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
 	item := app.Menu.Elements[y]	
 	if app.Menu.Elements[y].Submenu != nil {
 		app.Menu = item.Submenu
+		v.Clear()
 	}
-	v.Clear()
+	
 
 	if item.Route == "" {
 		return nil
 	}
 
-	err := app.send(string(item.Type), string(item.Route), map[string]string{})
+	bodyView, err := g.View(body)
+	if err != nil {
+		app.Error = err.Error()
+	}
+	bodyView.Clear()
+
+	err = app.send(string(item.Type), string(item.Route), map[string]string{})
 	if err != nil {
 		app.Error = err.Error()
 	}
@@ -135,6 +154,22 @@ func moveDown(g *gocui.Gui, v *gocui.View) error {
 	if v != nil {
 		x, y := v.Cursor()
 		v.SetCursor(x, y + 1)
+	}
+	return nil
+}
+
+func moveBodyUp(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Origin()
+		v.SetOrigin(x, y - 1)
+	}
+	return nil
+}
+
+func moveBodyDown(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Origin()
+		v.SetOrigin(x, y + 1)
 	}
 	return nil
 }

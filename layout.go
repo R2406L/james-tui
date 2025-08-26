@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/tidwall/pretty"
 	"io/ioutil"
 )
 
@@ -122,28 +123,12 @@ func (app *App) setEditConnection(v *gocui.View) {
 }
 
 func (app *App) setResponse(g *gocui.Gui, v *gocui.View) {
-	v.Clear()
-	view := g.CurrentView()
-	if view != nil {
-		x, y := view.Cursor()
-		
-		if len(app.Menu.Elements) > y {
-			v.Write([]byte(fmt.Sprintf("Menu position: %s\n", app.Menu.Elements[y].Name)))
-		}
-		
-		v.Write([]byte(fmt.Sprintf("Cursor position: %s (%d, %d)\n", view.Name(), x, y)))
+	if v != nil && len(v.Buffer()) == 0 && app.Response != nil {
+		v.Write([]byte(fmt.Sprintf("Server response: %d\n", app.Response.StatusCode)))
+		v.Write([]byte(fmt.Sprintf("Server headers: %v\n", app.Response.Header)))
 
-		if app.Error != "" {
-			v.Write([]byte(fmt.Sprintf("Server error: %s\n", app.Error)))
-		}
-
-		if app.Response != nil {
-			v.Write([]byte(fmt.Sprintf("Server response: %d\n", app.Response.StatusCode)))
-			v.Write([]byte(fmt.Sprintf("Server headers: %v\n", app.Response.Header)))
-
-			body, _ := ioutil.ReadAll(app.Response.Body)
-			v.Write([]byte("Server body:\n"))
-			v.Write([]byte(fmt.Sprintf("%s\n", string(body))))
-		}
+		body, _ := ioutil.ReadAll(app.Response.Body)
+		v.Write([]byte("Server body:\n"))
+		v.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
 	}
 }
