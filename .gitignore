@@ -23,4 +23,4 @@ apache-james-tui
 go.work
 
 # Logfile
-jamesTUI.log
+james_tui.log

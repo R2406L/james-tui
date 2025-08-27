@@ -16,13 +16,24 @@ type App struct {
 	Error		string
 }
 
+const (
+	body = "body"
+	header = "header"
+	menu = "menu"
+	editConnection = "editConnection"
+	titleHeader = " %s [e]dit | Ctrl+C - [q]uit | Tab - Switch view "
+	titleMenu = "Main menu"
+	titleBody = "Server response"
+	titleEditConnection = "Edit connection to server"
+)
+
 func main() {
 	app := App{
 		Url: "http://127.0.0.1:8000/",
 		Menu: getMenu(),
 	}
 
-	f, err := os.OpenFile("jamesTUI.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	f, err := os.OpenFile("james_tui.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
 	if err != nil {
     	log.Fatalf("Error opening log file: %v", err)
 	}

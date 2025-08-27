@@ -1,15 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"log"
-)
-
-const (
-	body = "body"
-	header = "header"
-	menu = "menu"
-	editConnection = "editConnection"
 )
 
 func (app *App) keyBindings(g *gocui.Gui) (err error) {
@@ -69,6 +62,16 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
+	err = g.SetKeybinding(editConnection, gocui.KeyArrowLeft, gocui.ModNone, editorMoveLeft)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding(editConnection, gocui.KeyArrowRight, gocui.ModNone, editorMoveRight)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -77,34 +80,52 @@ func (app *App) editConnection(g *gocui.Gui, v *gocui.View) error {
 	if err != nil || view == nil {
 		return err
 	}
-	view.SetWritePos(0, len(" Server address: "))
+
+	view.SetCursor(0, len(" Server address: "))
+	view.Editable = true
 	view.Visible = true
 	app.View = view
+	
 	g.SetViewOnTop(editConnection)
 	g.SetCurrentView(editConnection)
-	log.Printf("View: %s, %v", view.Name(), view.Visible)
+
 	return nil
 }
 
 func (app *App) editConnectionSave(g *gocui.Gui, v *gocui.View) error {
 	app.View.Visible = false
-	menuView, err := g.View("menu")
+	app.View.Editable = false
+	app.Url = app.View.Buffer()
+
+	headerView, err := g.View(header)
+	if err != nil {
+		return err
+	}
+	headerView.Title = fmt.Sprintf(titleHeader, app.Url)
+
+	menuView, err := g.View(menu)
 	if err != nil {
 		return err
 	}
 	app.View = menuView
+
 	g.SetCurrentView(menuView.Name())
+
 	return nil
 }
 
 func (app *App) editConnectionCancel(g *gocui.Gui, v *gocui.View) error {
 	app.View.Visible = false
-	menuView, err := g.View("menu")
+	app.View.Editable = false
+	
+	menuView, err := g.View(menu)
 	if err != nil {
 		return err
 	}
+	
 	app.View = menuView
 	g.SetCurrentView(menuView.Name())
+	
 	return nil
 }
 
@@ -170,6 +191,38 @@ func moveBodyDown(g *gocui.Gui, v *gocui.View) error {
 	if v != nil {
 		x, y := v.Origin()
 		v.SetOrigin(x, y + 1)
+	}
+	return nil
+}
+
+func editorMoveUp(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Cursor()
+		v.SetCursor(x, y - 1)
+	}
+	return nil
+}
+
+func editorMoveDown(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Cursor()
+		v.SetCursor(x, y + 1)
+	}
+	return nil
+}
+
+func editorMoveLeft(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Cursor()
+		v.SetCursor(x - 1, y)
+	}
+	return nil
+}
+
+func editorMoveRight(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		x, y := v.Cursor()
+		v.SetCursor(x + 1, y)
 	}
 	return nil
 }

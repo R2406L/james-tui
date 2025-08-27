@@ -6,6 +6,7 @@ import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/tidwall/pretty"
 	"io/ioutil"
+	"log"
 )
 
 func (app *App) getNextView() (view *gocui.View, err error) {
@@ -38,12 +39,13 @@ func (app *App) getNextView() (view *gocui.View, err error) {
 func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	maxX, maxY := g.Size()
 
+	log.Print(app.Url)
 	// Header
-	v, err := g.SetView("header", int(0), int(0), maxX-1, maxY-1, byte(0))
+	v, err := g.SetView(header, int(0), int(0), maxX-1, maxY-1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
-	v.Title = fmt.Sprintf(" %s [e]dit | Ctrl+C - [q]uit | Tab - Switch view ", app.Url)
+	v.Title = fmt.Sprintf(titleHeader, app.Url)
 	v.Frame = true
 	v.FrameRunes = []rune{'═','║','╔','╗','╚','╝'}
 	app.Views = append(app.Views, v)
@@ -53,7 +55,7 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
-	v.Title = "Main menu"
+	v.Title = titleMenu
 	v.Highlight = true
 	v.SelBgColor = gocui.ColorBlue
 	v.SelFgColor = gocui.ColorWhite
@@ -61,11 +63,12 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	app.View = v
 
 	// Body
-	v, err = g.SetView("body", int(31), int(1), maxX-2, maxY-2, byte(0))
+	v, err = g.SetView(body, int(31), int(1), maxX-2, maxY-2, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
-	v.Title = "Server response"
+	v.Title = titleBody
+	v.Highlight = false
 	v.Wrap = true
 	app.Views = append(app.Views, v)
 
@@ -74,8 +77,8 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
-	v.Title = "Edit connection"
-	v.Highlight = true
+	v.Title = titleEditConnection
+	v.Highlight = false
 	v.Frame = true
 	v.Visible = false
 	app.Views = append(app.Views, v)
@@ -118,17 +121,13 @@ func (app *App) setMenu(v *gocui.View) {
 
 func (app *App) setEditConnection(v *gocui.View) {
 	if v != nil && len(v.Buffer()) == 0 {
-		v.Write([]byte(fmt.Sprintf(" Server address: %s", app.Url)))
+		v.Write([]byte(app.Url))
 	}
 }
 
 func (app *App) setResponse(g *gocui.Gui, v *gocui.View) {
 	if v != nil && len(v.Buffer()) == 0 && app.Response != nil {
-		v.Write([]byte(fmt.Sprintf("Server response: %d\n", app.Response.StatusCode)))
-		v.Write([]byte(fmt.Sprintf("Server headers: %v\n", app.Response.Header)))
-
 		body, _ := ioutil.ReadAll(app.Response.Body)
-		v.Write([]byte("Server body:\n"))
 		v.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
 	}
 }
