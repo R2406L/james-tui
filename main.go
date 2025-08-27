@@ -10,6 +10,7 @@ import (
 type App struct {
 	Url			string
 	Menu		*Menu
+	MenuItem	*MenuItem
 	View		*gocui.View
 	Views		[]*gocui.View
 	Response	*http.Response
@@ -21,17 +22,20 @@ const (
 	header = "header"
 	menu = "menu"
 	editConnection = "editConnection"
+	inputLayout = "inputLayout"
 	titleHeader = " %s [e]dit | Ctrl+C - [q]uit | Tab - Switch view "
 	titleMenu = "Main menu"
 	titleBody = "Server response"
 	titleEditConnection = "Edit connection to server"
+	titleEnterEmail = "Edit email address"
 )
 
 func main() {
+
 	app := App{
 		Url: "http://127.0.0.1:8000/",
-		Menu: getMenu(),
 	}
+	app.Menu = app.getMenu()
 
 	f, err := os.OpenFile("james_tui.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
 	if err != nil {

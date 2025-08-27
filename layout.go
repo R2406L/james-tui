@@ -73,11 +73,20 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	app.Views = append(app.Views, v)
 
 	// Edit connection
-	v, err = g.SetView("editConnection", maxX / 2 - 30, maxY / 2 - 1, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	v, err = g.SetView(editConnection, maxX / 2 - 30, maxY / 2 - 1, maxX / 2 + 30, maxY / 2 + 1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
-	v.Title = titleEditConnection
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	// Input Layout
+	v, err = g.SetView(inputLayout, maxX / 2 - 30, maxY / 2 - 1, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
 	v.Highlight = false
 	v.Frame = true
 	v.Visible = false
