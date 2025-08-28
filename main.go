@@ -21,13 +21,16 @@ const (
 	body = "body"
 	header = "header"
 	menu = "menu"
+	notice = "notice"
 	editConnection = "editConnection"
 	inputLayout = "inputLayout"
+	inputPasswordLayout = "inputPasswordLayout"
 	titleHeader = " %s [e]dit | F10 - quit | Tab - Switch view "
 	titleMenu = "Main menu"
 	titleBody = "Server response"
 	titleEditConnection = "Edit connection to server"
 	titleEnterEmail = "Edit email address"
+	titleNotice = "Notice"
 	subtitleInput = "Enter - Save | Esc - Cancel"
 )
 

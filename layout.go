@@ -6,7 +6,6 @@ import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/tidwall/pretty"
 	"io/ioutil"
-	"log"
 )
 
 func (app *App) getNextView() (view *gocui.View, err error) {
@@ -39,7 +38,6 @@ func (app *App) getNextView() (view *gocui.View, err error) {
 func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	maxX, maxY := g.Size()
 
-	log.Print(app.Url)
 	// Header
 	v, err := g.SetView(header, int(0), int(0), maxX-1, maxY-1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
@@ -51,7 +49,7 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	app.Views = append(app.Views, v)
 
 	// Menu
-	v, err = g.SetView("menu", int(1), int(1), int(30), maxY-2, byte(0))
+	v, err = g.SetView(menu, int(1), int(1), int(30), maxY-10, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
@@ -61,6 +59,15 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.SelFgColor = gocui.ColorWhite
 	app.Views = append(app.Views, v)
 	app.View = v
+
+	// Notice window
+	v, err = g.SetView(notice, int(1), maxY-9, int(30), maxY-2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Title = titleNotice
+	v.Highlight = false
+	app.Views = append(app.Views, v)
 
 	// Body
 	v, err = g.SetView(body, int(31), int(1), maxX-2, maxY-2, byte(0))
@@ -92,6 +99,16 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 
+	// Input multiple layots
+	v, err = g.SetView(inputPasswordLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 + 10, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
 	return nil
 }
 
@@ -107,6 +124,12 @@ func (app *App) defineLayouts(g *gocui.Gui) (err error) {
 			v.Write([]byte(fmt.Sprintf("%s\n", e.Name)))
 		}
 	}
+
+	v, err = g.View(notice)
+	if err != nil {
+		return err
+	}
+	app.setNotice(v)
 
 	g.SetCurrentView(app.View.Name())
 
@@ -126,5 +149,13 @@ func (app *App) setResponse() {
 	if view != nil && app.Response != nil {
 		body, _ := ioutil.ReadAll(app.Response.Body)
 		view.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
+	}
+}
+
+func (app *App) setNotice(v *gocui.View) {
+	v.Clear()
+
+	if v != nil && app.Response != nil {
+		v.Write([]byte(fmt.Sprintf("Server response code: %d\n", app.Response.StatusCode)))
 	}
 }
