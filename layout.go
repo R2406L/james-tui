@@ -97,46 +97,34 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 
 func (app *App) defineLayouts(g *gocui.Gui) (err error) {
 
-	v, err := g.View("menu")
+	v, err := g.View(menu)
 	if err != nil {
 		return err
 	}
-	app.setMenu(v)
-
-	v, err = g.View("body")
-	if err != nil {
-		return err
+	
+	if len(v.Buffer()) == 0 {
+		for _, e := range app.Menu.Elements {
+			v.Write([]byte(fmt.Sprintf("%s\n", e.Name)))
+		}
 	}
-	app.setResponse(g, v)
-
-	v, err = g.View("editConnection")
-	if err != nil {
-		return err
-	}
-	app.setEditConnection(v)
 
 	g.SetCurrentView(app.View.Name())
 
 	return nil
 }
 
-func (app *App) setMenu(v *gocui.View) {
-	if v != nil && len(v.Buffer()) == 0 {
-		for _, e := range app.Menu.Elements {
-			v.Write([]byte(fmt.Sprintf("%s\n", e.Name)))
+func (app *App) setResponse() {
+	var view *gocui.View
+	for _, v := range app.Views {
+		if v.Name() == body {
+			view = v
+			break
 		}
 	}
-}
+	view.Clear()
 
-func (app *App) setEditConnection(v *gocui.View) {
-	if v != nil && len(v.Buffer()) == 0 {
-		v.Write([]byte(app.Url))
-	}
-}
-
-func (app *App) setResponse(g *gocui.Gui, v *gocui.View) {
-	if v != nil && len(v.Buffer()) == 0 && app.Response != nil {
+	if view != nil && app.Response != nil {
 		body, _ := ioutil.ReadAll(app.Response.Body)
-		v.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
+		view.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
 	}
 }

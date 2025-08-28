@@ -23,11 +23,12 @@ const (
 	menu = "menu"
 	editConnection = "editConnection"
 	inputLayout = "inputLayout"
-	titleHeader = " %s [e]dit | Ctrl+C - [q]uit | Tab - Switch view "
+	titleHeader = " %s [e]dit | F10 - quit | Tab - Switch view "
 	titleMenu = "Main menu"
 	titleBody = "Server response"
 	titleEditConnection = "Edit connection to server"
 	titleEnterEmail = "Edit email address"
+	subtitleInput = "Enter - Save | Esc - Cancel"
 )
 
 func main() {
@@ -64,10 +65,6 @@ func main() {
 	err = app.keyBindings(g)
 	if err != nil {
 		log.Fatalf("Error key bindings: %v", err)
-	}
-
-	for _, v := range app.Views {
-		log.Print(v.Name())
 	}
 
 	err = g.MainLoop()

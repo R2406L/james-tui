@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"log"
 )
 
 func (app *App) keyBindings(g *gocui.Gui) (err error) {
@@ -13,7 +12,7 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
-	err = g.SetKeybinding("", 'q', gocui.ModNone, quit)
+	err = g.SetKeybinding("", gocui.KeyF10, gocui.ModNone, quit)
 	if err != nil {
 		return
 	}
@@ -87,6 +86,10 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 }
 
 // Layout global function
+func pass(g *gocui.Gui, v *gocui.View) error {
+	return nil
+}
+
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
@@ -169,13 +172,7 @@ func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 
-	bodyView, err := g.View(body)
-	if err != nil {
-		app.Error = err.Error()
-	}
-	bodyView.Clear()
-
-	err = app.send(string(item.Type), string(item.Route), map[string]string{})
+	err := app.send(string(item.Type), string(item.Route), map[string]string{})
 	if err != nil {
 		app.Error = err.Error()
 	}
@@ -209,12 +206,13 @@ func (app *App) cancel(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (app *App) editConnection(g *gocui.Gui, v *gocui.View) error {
-	view, err := g.View(inputLayout)
+	view, err := g.View(editConnection)
 	if err != nil || view == nil {
 		return err
 	}
 
 	view.Title = titleEditConnection
+	view.Write([]byte(app.Url))
 	view.Editable = true
 	view.Visible = true
 	app.View = view
@@ -252,8 +250,10 @@ func (app *App) inputShow(g *gocui.Gui) (err error) {
 	if err != nil || view == nil {
 		return err
 	}
+	view.Clear()
 
 	view.Title = app.MenuItem.Title
+	view.Subtitle = subtitleInput
 	view.Editable = true
 	view.Visible = true
 	app.View = view
@@ -269,7 +269,6 @@ func (app *App) inputSave(g *gocui.Gui, v *gocui.View) error {
 	app.View.Editable = false
 	
 	value := app.View.Buffer()
-	log.Printf("Value: %s", value)
 
 	menuView, err := g.View(menu)
 	if err != nil {
@@ -278,6 +277,7 @@ func (app *App) inputSave(g *gocui.Gui, v *gocui.View) error {
 	app.View = menuView
 
 	g.SetCurrentView(menuView.Name())
+	app.MenuItem.Handler(value)
 
 	return nil
 }

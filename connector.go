@@ -32,7 +32,9 @@ func (app *App) send(method string, route string, args map[string]string) (err e
 	if err != nil {
 		return
 	}
-
+	
 	app.Response = response
+	app.setResponse()
+
 	return
 }
