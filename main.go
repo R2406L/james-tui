@@ -10,22 +10,35 @@ import (
 type App struct {
 	Url			string
 	Menu		*Menu
-	View		string
-	Views		[]string
+	MenuItem	*MenuItem
+	View		*gocui.View
+	Views		[]*gocui.View
 	Response	*http.Response
 	Error		string
 }
+
+const (
+	body = "body"
+	header = "header"
+	menu = "menu"
+	editConnection = "editConnection"
+	inputLayout = "inputLayout"
+	titleHeader = " %s [e]dit | F10 - quit | Tab - Switch view "
+	titleMenu = "Main menu"
+	titleBody = "Server response"
+	titleEditConnection = "Edit connection to server"
+	titleEnterEmail = "Edit email address"
+	subtitleInput = "Enter - Save | Esc - Cancel"
+)
 
 func main() {
 
 	app := App{
 		Url: "http://127.0.0.1:8000/",
-		Menu: getMenu(),
-		View: "menu",
-		Views: []string{"menu", "body",},
 	}
+	app.Menu = app.getMenu()
 
-	f, err := os.OpenFile("logfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	f, err := os.OpenFile("james_tui.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
 	if err != nil {
     	log.Fatalf("Error opening log file: %v", err)
 	}
@@ -43,8 +56,12 @@ func main() {
 	g.SelFgColor = gocui.ColorGreen
 	g.SelFrameColor = gocui.ColorGreen
 	
-	g.SetManagerFunc(app.mainLayout)
-	
+	g.SetManagerFunc(app.defineLayouts)
+	err = app.defineWindows(g)
+	if err != nil {
+		log.Fatalf("Error set layout settings: %v", err)
+	}
+		
 	err = app.keyBindings(g)
 	if err != nil {
 		log.Fatalf("Error key bindings: %v", err)
