@@ -10,7 +10,7 @@ type Menu struct {
 }
 
 type MenuCallback func(g *gocui.Gui) (err error)
-type MenuHandler func(data string)
+type MenuHandler func(args []string)
 
 type MenuItem struct {
 	Name		string
@@ -47,9 +47,9 @@ func (app *App) getMenu() *Menu {
 	users.Elements = append(users.Elements, &MenuItem{Name: "List", Submenu: nil, Route: "users", Type: "GET",})
 	users.Elements = append(users.Elements, &MenuItem{Name: "Mailboxes", Submenu: nil, Route: "users/%s/mailboxes", Type: "GET", Title: "Enter email address", Function: app.inputShow, Handler: app.simpleHandler})
 	users.Elements = append(users.Elements, &MenuItem{Name: "View", Submenu: nil, Route: "users/%s", Type: "GET", Title: "Enter email address", Function: app.inputShow, Handler: app.simpleHandler})
-	users.Elements = append(users.Elements, &MenuItem{Name: "Add", Submenu: nil, Route: "", Type: "",})
+	users.Elements = append(users.Elements, &MenuItem{Name: "Add", Submenu: nil, Route: "users/%s", Type: "PUT", Title: "Create new email", Function: app.inputEmailPasswordShow, Handler: app.inputEmailPasswordHandler})
 	users.Elements = append(users.Elements, &MenuItem{Name: "Delete", Submenu: nil, Route: "users/%s", Type: "DELETE", Title: "Enter email address", Function: app.inputShow, Handler: app.simpleHandler})
-	users.Elements = append(users.Elements, &MenuItem{Name: "Change password", Submenu: nil, Route: "", Type: "",})
+	users.Elements = append(users.Elements, &MenuItem{Name: "Change password", Submenu: nil, Route: "users/%s", Type: "PUT", Title: "Change email password",})
 
 	main.Elements = append(main.Elements, &MenuItem{Name: "HealthCheck", Submenu: nil, Route: "healthcheck", Type: "GET",})
 	main.Elements = append(main.Elements, &MenuItem{Name: "Domains", Submenu: &domain, Route: "", Type: "",})

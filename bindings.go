@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"log"
 )
 
 func (app *App) keyBindings(g *gocui.Gui) (err error) {
@@ -83,67 +84,85 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 	}
 
 	return
+
 }
 
 // Layout global function
 func pass(g *gocui.Gui, v *gocui.View) error {
+	
 	return nil
+
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
+	
 	return gocui.ErrQuit
+
 }
 
 func moveLeft(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Cursor()
 		v.SetCursor(x - 1, y)
 	}
 	return nil
+
 }
 
 func moveRight(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Cursor()
 		v.SetCursor(x + 1, y)
 	}
 	return nil
+
 }
 
 func moveUp(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Cursor()
 		v.SetCursor(x, y - 1)
 	}
 	return nil
+
 }
 
 func moveDown(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Cursor()
 		v.SetCursor(x, y + 1)
 	}
 	return nil
+
 }
 
 func moveBodyUp(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Origin()
 		v.SetOrigin(x, y - 1)
 	}
 	return nil
+
 }
 
 func moveBodyDown(g *gocui.Gui, v *gocui.View) error {
+	
 	if v != nil {
 		x, y := v.Origin()
 		v.SetOrigin(x, y + 1)
 	}
 	return nil
+
 }
 
 // Layout call function
 func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
+	
 	_, y := v.Cursor()
 
 	if y >= len(app.Menu.Elements) {
@@ -162,7 +181,7 @@ func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
 	if item.Function != nil {
 		err := item.Function(g)
 		if err != nil {
-			app.Error = err.Error()
+			log.Printf("Function error: %s", err.Error())
 		}
 		
 		return nil
@@ -174,13 +193,14 @@ func (app *App) enter(g *gocui.Gui, v *gocui.View) error {
 
 	err := app.send(string(item.Type), string(item.Route), map[string]string{})
 	if err != nil {
-		app.Error = err.Error()
+		log.Printf("Server response error: %s", err.Error())
 	}
 
 	return nil
 }
 
 func (app *App) switchView(g *gocui.Gui, v *gocui.View) (err error) {
+	
 	newView, err := app.getNextView()
 	if err != nil {
 		return err
@@ -191,6 +211,7 @@ func (app *App) switchView(g *gocui.Gui, v *gocui.View) (err error) {
 }
 
 func (app *App) cancel(g *gocui.Gui, v *gocui.View) error {
+	
 	app.View.Visible = false
 	app.View.Editable = false
 	
@@ -206,12 +227,14 @@ func (app *App) cancel(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (app *App) editConnection(g *gocui.Gui, v *gocui.View) error {
+	
 	view, err := g.View(editConnection)
 	if err != nil || view == nil {
 		return err
 	}
 
 	view.Title = titleEditConnection
+	view.Subtitle = subtitleInput
 	view.Write([]byte(app.Url))
 	view.Editable = true
 	view.Visible = true
@@ -224,6 +247,7 @@ func (app *App) editConnection(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (app *App) editConnectionSave(g *gocui.Gui, v *gocui.View) error {
+	
 	app.View.Visible = false
 	app.View.Editable = false
 	app.Url = app.View.Buffer()
@@ -246,6 +270,7 @@ func (app *App) editConnectionSave(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (app *App) inputShow(g *gocui.Gui) (err error) {
+	
 	view, err := g.View(inputLayout)
 	if err != nil || view == nil {
 		return err
@@ -265,6 +290,7 @@ func (app *App) inputShow(g *gocui.Gui) (err error) {
 }
 
 func (app *App) inputSave(g *gocui.Gui, v *gocui.View) error {
+	
 	app.View.Visible = false
 	app.View.Editable = false
 	
@@ -277,7 +303,70 @@ func (app *App) inputSave(g *gocui.Gui, v *gocui.View) error {
 	app.View = menuView
 
 	g.SetCurrentView(menuView.Name())
-	app.MenuItem.Handler(value)
+	app.MenuItem.Handler([]string{value})
+
+	return nil
+}
+
+func (app *App) inputEmailPasswordShow(g *gocui.Gui) (err error) {
+
+	for _, v := range g.Views() {
+		log.Print(v.Name())
+	}
+
+	view, err := g.View(inputEmailPasswordLayout)
+	if err != nil || view == nil {
+		return err
+	}
+
+	view_email, err := g.View(inputEmailPasswordLayout_email)
+	if err != nil || view_email == nil {
+		return err
+	}
+
+	view_password, err := g.View(inputEmailPasswordLayout_password)
+	if err != nil || view_password == nil {
+		return err
+	}
+
+	view_ok, err := g.View(inputEmailPasswordLayout_buttonOk)
+	if err != nil || view == nil {
+		return err
+	}
+
+	view_cancel, err := g.View(inputEmailPasswordLayout_buttonCancel)
+	if err != nil || view == nil {
+		return err
+	}
+
+	view.Title = app.MenuItem.Title
+	view.Editable = false
+	view.Visible = true
+	g.SetViewOnTop(inputEmailPasswordLayout)
+
+	view_email.Editable = true
+	view_email.Visible = true
+	app.View = view_email
+	g.SetViewOnTop(inputEmailPasswordLayout_email)
+	g.SetCurrentView(inputEmailPasswordLayout_email)
+
+	view_password.Editable = true
+	view_password.Visible = true
+	view_password.Mask = '*'
+	g.SetViewOnTop(inputEmailPasswordLayout_password)
+
+	view_ok.Editable = false
+	view_ok.Visible = true
+	view_ok.Highlight = false
+	view_ok.Write([]byte("        OK"))
+	g.SetViewOnTop(inputEmailPasswordLayout_buttonOk)
+
+	view_cancel.Editable = false
+	view_cancel.Visible = true
+	view_cancel.Highlight = false
+	view_cancel.Write([]byte("      Cancel"))
+	g.SetViewOnTop(inputEmailPasswordLayout_buttonCancel)
+
 
 	return nil
 }
