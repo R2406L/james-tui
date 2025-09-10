@@ -6,7 +6,6 @@ import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/tidwall/pretty"
 	"io/ioutil"
-	"log"
 )
 
 func (app *App) getNextView() (view *gocui.View, err error) {
@@ -34,24 +33,26 @@ func (app *App) getNextView() (view *gocui.View, err error) {
 	}
 	
 	return app.Views[0], nil
+
 }
 
 func (app *App) defineWindows(g *gocui.Gui) (err error) {
+	
 	maxX, maxY := g.Size()
 
-	log.Print(app.Url)
 	// Header
 	v, err := g.SetView(header, int(0), int(0), maxX-1, maxY-1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v.Title = fmt.Sprintf(titleHeader, app.Url)
+	v.Subtitle = titleHeaderSubtitle
 	v.Frame = true
 	v.FrameRunes = []rune{'═','║','╔','╗','╚','╝'}
 	app.Views = append(app.Views, v)
 
 	// Menu
-	v, err = g.SetView("menu", int(1), int(1), int(30), maxY-2, byte(0))
+	v, err = g.SetView(menu, int(1), int(1), int(30), maxY-10, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
@@ -61,6 +62,15 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.SelFgColor = gocui.ColorWhite
 	app.Views = append(app.Views, v)
 	app.View = v
+
+	// Notice window
+	v, err = g.SetView(notice, int(1), maxY-9, int(30), maxY-2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Title = titleNotice
+	v.Highlight = false
+	app.Views = append(app.Views, v)
 
 	// Body
 	v, err = g.SetView(body, int(31), int(1), maxX-2, maxY-2, byte(0))
@@ -82,8 +92,8 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 
-	// Input Layout
-	v, err = g.SetView(inputLayout, maxX / 2 - 30, maxY / 2 - 1, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	// Input simple layout
+	v, err = g.SetView(inputSimpleLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 - 1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
@@ -92,7 +102,83 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 
+	v, err = g.SetView(inputSimpleLayout_editor, maxX / 2 - 8, maxY / 2 - 9, maxX / 2 + 28, maxY / 2 - 7, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputSimpleLayout_buttonCancel, maxX / 2 - 25, maxY / 2 - 5, maxX / 2 - 5, maxY / 2 - 3, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputSimpleLayout_buttonOk, maxX / 2 + 5, maxY / 2 - 5, maxX / 2 + 25, maxY / 2 - 3, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+	
+	// Input multiple layots
+	v, err = g.SetView(inputEmailPasswordLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	v.Write([]byte(inputEmailPasswordLayout_body))
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputEmailPasswordLayout_email, maxX / 2 - 8, maxY / 2 - 9, maxX / 2 + 28, maxY / 2 - 7, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputEmailPasswordLayout_password, maxX / 2 - 8, maxY / 2 - 6, maxX / 2 + 28, maxY / 2 - 4, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputEmailPasswordLayout_buttonCancel, maxX / 2 - 25, maxY / 2 - 2, maxX / 2 - 5, maxY / 2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputEmailPasswordLayout_buttonOk, maxX / 2 + 5, maxY / 2 - 2, maxX / 2 + 25, maxY / 2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+
 	return nil
+
 }
 
 func (app *App) defineLayouts(g *gocui.Gui) (err error) {
@@ -108,12 +194,20 @@ func (app *App) defineLayouts(g *gocui.Gui) (err error) {
 		}
 	}
 
+	v, err = g.View(notice)
+	if err != nil {
+		return err
+	}
+	app.setNotice(v)
+
 	g.SetCurrentView(app.View.Name())
 
 	return nil
+
 }
 
 func (app *App) setResponse() {
+	
 	var view *gocui.View
 	for _, v := range app.Views {
 		if v.Name() == body {
@@ -127,4 +221,15 @@ func (app *App) setResponse() {
 		body, _ := ioutil.ReadAll(app.Response.Body)
 		view.Write([]byte(fmt.Sprintf("%s\n", pretty.Pretty(body))))
 	}
+
+}
+
+func (app *App) setNotice(v *gocui.View) {
+	
+	v.Clear()
+
+	if v != nil && app.Response != nil {
+		v.Write([]byte(fmt.Sprintf("Server response code: %d\n", app.Response.StatusCode)))
+	}
+
 }
