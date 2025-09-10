@@ -32,6 +32,11 @@ func (app *App) getMenu() *Menu {
 		Elements: make([]*MenuItem, 0),
 	}
 
+	droplist := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
 	users := Menu{
 		Parent: &main,
 		Elements: make([]*MenuItem, 0),
@@ -42,12 +47,37 @@ func (app *App) getMenu() *Menu {
 		Elements: make([]*MenuItem, 0),
 	}
 
+	messages := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
 	tasks := Menu{
 		Parent: &main,
 		Elements: make([]*MenuItem, 0),
 	}
 
 	tasks_status := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
+	sieve := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
+	jmap := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
+	quotas := Menu{
+		Parent: &main,
+		Elements: make([]*MenuItem, 0),
+	}
+
+	queues := Menu{
 		Parent: &main,
 		Elements: make([]*MenuItem, 0),
 	}
@@ -68,12 +98,10 @@ func (app *App) getMenu() *Menu {
 
 	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
 	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "Reindex all", Submenu: nil, Route: "mailboxes?task=reIndex", Type: "POST",})
-	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "Reindex one", Submenu: nil, Route: "mailboxes?task=reIndexOne", Type: "POST",})
-	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "Send scheduled", Submenu: nil, Route: "scheduler/run", Type: "POST",})
 
 	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
-	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "⛁ List", Submenu: &tasks_status, Route: "", Type: "",})
-	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "Detail", Submenu: nil, Route: "tasks/%s", Type: "GET",})
+	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "List", Submenu: &tasks_status, Route: "", Type: "",})
+	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "Detail", Submenu: nil, Route: "tasks/%s", Type: "GET", Title: "Enter task ID", Function: app.inputSimpleShow, Handler: app.simpleHandler})
 
 	tasks_status.Elements = append(tasks_status.Elements, &MenuItem{Name: "..", Submenu: &tasks, Route: "", Type: "",})
 	tasks_status.Elements = append(tasks_status.Elements, &MenuItem{Name: "All", Submenu: nil, Route: "tasks", Type: "GET",})
@@ -83,19 +111,35 @@ func (app *App) getMenu() *Menu {
 	tasks_status.Elements = append(tasks_status.Elements, &MenuItem{Name: "Completed", Submenu: nil, Route: "tasks?status=completed", Type: "GET",})
 	tasks_status.Elements = append(tasks_status.Elements, &MenuItem{Name: "Failed", Submenu: nil, Route: "tasks?status=failed", Type: "GET",})
 
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "All", Submenu: nil, Route: "mailQueues", Type: "GET",})
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "Detail", Submenu: nil, Route: "mailQueues/%s", Type: "GET", Title: "Enter queue", Function: app.inputSimpleShow, Handler: app.simpleHandler,})
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "Messages", Submenu: nil, Route: "mailQueues/%s/mails", Type: "GET", Title: "Enter queue", Function: app.inputSimpleShow, Handler: app.simpleHandler,})
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "Flush", Submenu: nil, Route: "mailQueues/%s?delayed=true", Type: "PATCH", Title: "Enter queue", Function: app.inputSimpleShow, Handler: app.simpleHandler,})
+	queues.Elements = append(queues.Elements, &MenuItem{Name: "Update browse start", Submenu: nil, Route: "/mailQueues/%s?action=updateBrowseStart", Type: "POST", Title: "Enter queue", Function: app.inputSimpleShow, Handler: app.simpleHandler,})
+
+	messages.Elements = append(messages.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+
+	sieve.Elements = append(droplist.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+
+	droplist.Elements = append(droplist.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+
+	jmap.Elements = append(jmap.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+
+	quotas.Elements = append(quotas.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
+
 	main.Elements = append(main.Elements, &MenuItem{Name: "HealthCheck", Submenu: nil, Route: "healthcheck", Type: "GET",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "⛁ Domains", Submenu: &domain, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "⛁ Users", Submenu: &users, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "⛁ Mailboxes", Submenu: &mailboxes, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Messages", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Quotas", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Droplist", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Queues", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Sieve", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Jmap", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "⛁ Tasks", Submenu: &tasks, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Domains", Submenu: &domain, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Users", Submenu: &users, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Mailboxes", Submenu: &mailboxes, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Messages", Submenu: &messages, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Quotas", Submenu: &quotas, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Droplist", Submenu: &droplist, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Queues", Submenu: &queues, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Sieve", Submenu: &sieve, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Jmap", Submenu: &jmap, Route: "", Type: "",})
+	main.Elements = append(main.Elements, &MenuItem{Name: "Tasks", Submenu: &tasks, Route: "", Type: "",})
 	main.Elements = append(main.Elements, &MenuItem{Name: "Send email", Submenu: nil, Route: "", Type: "",})
-	main.Elements = append(main.Elements, &MenuItem{Name: "Cassandra (*)", Submenu: nil, Route: "", Type: "",})
 	
 	return &main
 }
