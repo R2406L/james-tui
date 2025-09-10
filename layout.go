@@ -46,6 +46,7 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 		return err
 	}
 	v.Title = fmt.Sprintf(titleHeader, app.Url)
+	v.Subtitle = titleHeaderSubtitle
 	v.Frame = true
 	v.FrameRunes = []rune{'═','║','╔','╗','╚','╝'}
 	app.Views = append(app.Views, v)
@@ -91,8 +92,8 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 
-	// Input Layout
-	v, err = g.SetView(inputLayout, maxX / 2 - 30, maxY / 2 - 1, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	// Input simple layout
+	v, err = g.SetView(inputSimpleLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 - 1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
@@ -101,6 +102,33 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 
+	v, err = g.SetView(inputSimpleLayout_editor, maxX / 2 - 8, maxY / 2 - 9, maxX / 2 + 28, maxY / 2 - 7, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputSimpleLayout_buttonCancel, maxX / 2 - 25, maxY / 2 - 5, maxX / 2 - 5, maxY / 2 - 3, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputSimpleLayout_buttonOk, maxX / 2 + 5, maxY / 2 - 5, maxX / 2 + 25, maxY / 2 - 3, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+	
 	// Input multiple layots
 	v, err = g.SetView(inputEmailPasswordLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 + 1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {

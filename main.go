@@ -24,19 +24,27 @@ const (
 	notice = "notice"
 	editConnection = "editConnection"
 	inputLayout = "inputLayout"
+
+	inputSimpleLayout = "inputSimpleLayout"
+	inputSimpleLayout_editor = "inputSimpleLayout_email"
+	inputSimpleLayout_buttonCancel = "inputSimpleLayout_buttonCancel"
+	inputSimpleLayout_buttonOk = "inputSimpleLayout_buttonOk"
+
 	inputEmailPasswordLayout = "inputEmailPasswordLayout"
 	inputEmailPasswordLayout_email = "inputEmailPasswordLayout_email"
 	inputEmailPasswordLayout_password = "inputEmailPasswordLayout_password"
 	inputEmailPasswordLayout_buttonCancel = "inputEmailPasswordLayout_buttonCancel"
 	inputEmailPasswordLayout_buttonOk = "inputEmailPasswordLayout_buttonOk"
 	inputEmailPasswordLayout_body = "\n Enter email: \n\n\n Enter password: \n"
-	titleHeader = " %s [e]dit | F10 - quit | Tab - Switch view "
-	titleMenu = "Main menu"
-	titleBody = "Server response"
-	titleEditConnection = "Edit connection to server"
-	titleEnterEmail = "Edit email address"
-	titleNotice = "Notice"
-	subtitleInput = "Enter - Save | Esc - Cancel"
+	
+	titleHeader = " %s "
+	titleHeaderSubtitle = " [e]dit | F10 - quit | Tab - Switch view "
+	titleMenu = " Main menu "
+	titleBody = " Server response "
+	titleEditConnection = " Edit connection to server "
+	titleEnterEmail = " Edit email address "
+	titleNotice = " Notice "
+	subtitleInput = " Enter - Save | Esc - Cancel "
 )
 
 func main() {
