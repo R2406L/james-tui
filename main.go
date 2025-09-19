@@ -18,6 +18,9 @@ type App struct {
 }
 
 const (
+
+	version = "v0.0.3"
+
 	body = "body"
 	header = "header"
 	menu = "menu"
@@ -37,8 +40,15 @@ const (
 	inputEmailPasswordLayout_buttonOk = "inputEmailPasswordLayout_buttonOk"
 	inputEmailPasswordLayout_body = "\n Enter email: \n\n\n Enter password: \n"
 	
+	inputDuoLayout = "inputDuoLayout"
+	inputDuoLayout_first = "inputDuoLayout_first"
+	inputDuoLayout_second = "inputDuoLayout_second"
+	inputDuoLayout_buttonCancel = "inputDuoLayout_buttonCancel"
+	inputDuoLayout_buttonOk = "inputDuoLayout_buttonOk"
+	inputDuoLayout_body = "\n Enter first arg: \n\n\n Enter second arg: \n"
+
 	titleHeader = " %s "
-	titleHeaderSubtitle = " [e]dit | F10 - quit | Tab - Switch view "
+	titleHeaderSubtitle = " [e]dit | F10 - quit | Tab - Switch view ═ Version: %s "
 	titleMenu = " Main menu "
 	titleBody = " Server response "
 	titleEditConnection = " Edit connection to server "

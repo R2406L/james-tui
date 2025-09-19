@@ -88,7 +88,17 @@ func (app *App) keyBindings(g *gocui.Gui) (err error) {
 		return
 	}
 
-	err = g.SetKeybinding(inputEmailPasswordLayout_buttonCancel, gocui.KeyEnter, gocui.ModNone, app.inputEmailPasswordHide)
+	err = g.SetKeybinding(inputEmailPasswordLayout_buttonCancel, gocui.KeyEnter, gocui.ModNone, app.inputEmailPasswordLayoutHide)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding(inputDuoLayout_buttonOk, gocui.KeyEnter, gocui.ModNone, app.inputDuoLayoutSave)
+	if err != nil {
+		return
+	}
+
+	err = g.SetKeybinding(inputDuoLayout_buttonCancel, gocui.KeyEnter, gocui.ModNone, app.inputDuoLayoutHide)
 	if err != nil {
 		return
 	}
@@ -377,7 +387,7 @@ func (app *App) inputSimpleSave(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func (app *App) inputEmailPasswordShow(g *gocui.Gui, v *gocui.View) (err error) {
+func (app *App) inputEmailPasswordLayoutShow(g *gocui.Gui, v *gocui.View) (err error) {
 
 	view, err := g.View(inputEmailPasswordLayout)
 	if err != nil || view == nil {
@@ -440,7 +450,7 @@ func (app *App) inputEmailPasswordShow(g *gocui.Gui, v *gocui.View) (err error) 
 	return nil
 }
 
-func (app *App) inputEmailPasswordHide(g *gocui.Gui, v *gocui.View) (err error) {
+func (app *App) inputEmailPasswordLayoutHide(g *gocui.Gui, v *gocui.View) (err error) {
 
 	view, err := g.View(inputEmailPasswordLayout)
 	if err != nil || view == nil {
@@ -493,7 +503,131 @@ func (app *App) inputEmailPasswordLayoutSave(g *gocui.Gui, v *gocui.View) (err e
 	
 	app.MenuItem.Handler([]string{email, password})
 
-	app.inputEmailPasswordHide(g, v)
+	app.inputEmailPasswordLayoutHide(g, v)
+
+	return nil
+}
+
+func (app *App) inputDuoLayoutShow(g *gocui.Gui, v *gocui.View) (err error) {
+
+	view, err := g.View(inputDuoLayout)
+	if err != nil || view == nil {
+		return err
+	}
+
+	view_first, err := g.View(inputDuoLayout_first)
+	if err != nil || view_first == nil {
+		return err
+	}
+
+	view_second, err := g.View(inputDuoLayout_second)
+	if err != nil || view_second == nil {
+		return err
+	}
+
+	view_ok, err := g.View(inputDuoLayout_buttonOk)
+	if err != nil || view == nil {
+		return err
+	}
+
+	view_cancel, err := g.View(inputDuoLayout_buttonCancel)
+	if err != nil || view == nil {
+		return err
+	}
+
+	if app.MenuItem.Body != "" {
+		view.Clear()
+		view.Write([]byte(app.MenuItem.Body))
+	}
+	view.Title = app.MenuItem.Title
+	view.Editable = false
+	view.Visible = true
+	g.SetViewOnTop(inputDuoLayout)
+
+	view_first.Clear()
+	view_first.Editable = true
+	view_first.Visible = true
+	app.View = view_first
+	g.SetViewOnTop(inputDuoLayout_first)
+	g.SetCurrentView(inputDuoLayout_first)
+
+	view_second.Clear()
+	view_second.Editable = true
+	view_second.Visible = true
+	g.SetViewOnTop(inputDuoLayout_second)
+
+	view_ok.Clear()
+	view_ok.Editable = false
+	view_ok.Visible = true
+	view_ok.Highlight = false
+	view_ok.Write([]byte("        OK"))
+	g.SetViewOnTop(inputDuoLayout_buttonOk)
+
+	view_cancel.Clear()
+	view_cancel.Editable = false
+	view_cancel.Visible = true
+	view_cancel.Highlight = false
+	view_cancel.Write([]byte("      Cancel"))
+	g.SetViewOnTop(inputDuoLayout_buttonCancel)
+
+
+	return nil
+}
+
+func (app *App) inputDuoLayoutHide(g *gocui.Gui, v *gocui.View) (err error) {
+
+	view, err := g.View(inputDuoLayout)
+	if err != nil || view == nil {
+		return err
+	}
+	view.Visible = false
+
+	view_first, err := g.View(inputDuoLayout_first)
+	if err != nil || view_first == nil {
+		return err
+	}
+	view_first.Visible = false
+
+	view_second, err := g.View(inputDuoLayout_second)
+	if err != nil || view_second == nil {
+		return err
+	}
+	view_second.Visible = false
+
+	view_ok, err := g.View(inputDuoLayout_buttonOk)
+	if err != nil || view == nil {
+		return err
+	}
+	view_ok.Visible = false
+
+	view_cancel, err := g.View(inputDuoLayout_buttonCancel)
+	if err != nil || view == nil {
+		return err
+	}
+	view_cancel.Visible = false
+
+	app.selectMenuView(g, v)
+
+	return nil
+}
+
+func (app *App) inputDuoLayoutSave(g *gocui.Gui, v *gocui.View) (err error) {
+	
+	view_first, err := g.View(inputDuoLayout_first)
+	if err != nil || view_first == nil {
+		return err
+	}
+	first_value := view_first.Buffer()
+
+	view_second, err := g.View(inputDuoLayout_second)
+	if err != nil || view_second == nil {
+		return err
+	}
+	second_value := view_second.Buffer()
+	
+	app.MenuItem.Handler([]string{first_value, second_value})
+
+	app.inputDuoLayoutHide(g, v)
 
 	return nil
 }

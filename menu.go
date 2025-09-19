@@ -18,6 +18,7 @@ type MenuItem struct {
 	Route		string
 	Type		string
 	Title		string
+	Body		string
 	Function	MenuCallback
 	Handler		MenuHandler
 }
@@ -92,12 +93,13 @@ func (app *App) getMenu() *Menu {
 	users.Elements = append(users.Elements, &MenuItem{Name: "List", Submenu: nil, Route: "users", Type: "GET",})
 	users.Elements = append(users.Elements, &MenuItem{Name: "Mailboxes", Submenu: nil, Route: "users/%s/mailboxes", Type: "GET", Title: "Enter email address", Function: app.inputSimpleShow, Handler: app.simpleHandler})
 	users.Elements = append(users.Elements, &MenuItem{Name: "View", Submenu: nil, Route: "users/%s", Type: "GET", Title: "Enter email address", Function: app.inputSimpleShow, Handler: app.simpleHandler})
-	users.Elements = append(users.Elements, &MenuItem{Name: "Add", Submenu: nil, Route: "users/%s", Type: "PUT", Title: "Enter email address", Function: app.inputEmailPasswordShow, Handler: app.addUserHandler})
+	users.Elements = append(users.Elements, &MenuItem{Name: "Add", Submenu: nil, Route: "users/%s", Type: "PUT", Title: "Enter email address", Function: app.inputEmailPasswordLayoutShow, Handler: app.addUserHandler})
 	users.Elements = append(users.Elements, &MenuItem{Name: "Delete", Submenu: nil, Route: "users/%s", Type: "DELETE", Title: "Enter email address", Function: app.inputSimpleShow, Handler: app.simpleHandler})
-	users.Elements = append(users.Elements, &MenuItem{Name: "Change password", Submenu: nil, Route: "users/%s?force", Type: "PUT", Title: "Enter password", Function: app.inputEmailPasswordShow, Handler: app.changePasswordHandler})
+	users.Elements = append(users.Elements, &MenuItem{Name: "Change password", Submenu: nil, Route: "users/%s?force", Type: "PUT", Title: "Enter password", Function: app.inputEmailPasswordLayoutShow, Handler: app.changePasswordHandler})
 
 	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
 	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "Reindex all", Submenu: nil, Route: "mailboxes?task=reIndex", Type: "POST",})
+	mailboxes.Elements = append(mailboxes.Elements, &MenuItem{Name: "Clear mailbox", Submenu: nil, Route: "users/%s/mailboxes/%s/messages", Type: "DELETE", Title: "Clear user mailbox", Body: "\n Enter email: \n\n\n Enter mailbox: \n", Function: app.inputDuoLayoutShow, Handler: app.mailboxClearHandler})
 
 	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "..", Submenu: &main, Route: "", Type: "",})
 	tasks.Elements = append(tasks.Elements, &MenuItem{Name: "List", Submenu: &tasks_status, Route: "", Type: "",})
