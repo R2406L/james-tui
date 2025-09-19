@@ -46,7 +46,7 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 		return err
 	}
 	v.Title = fmt.Sprintf(titleHeader, app.Url)
-	v.Subtitle = titleHeaderSubtitle
+	v.Subtitle = fmt.Sprintf(titleHeaderSubtitle, version)
 	v.Frame = true
 	v.FrameRunes = []rune{'═','║','╔','╗','╚','╝'}
 	app.Views = append(app.Views, v)
@@ -129,6 +129,53 @@ func (app *App) defineWindows(g *gocui.Gui) (err error) {
 	v.Visible = false
 	app.Views = append(app.Views, v)
 	
+	// Input duo layots
+	v, err = g.SetView(inputDuoLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 + 1, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	v.Write([]byte(inputDuoLayout_body))
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputDuoLayout_first, maxX / 2 - 8, maxY / 2 - 9, maxX / 2 + 28, maxY / 2 - 7, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputDuoLayout_second, maxX / 2 - 8, maxY / 2 - 6, maxX / 2 + 28, maxY / 2 - 4, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputDuoLayout_buttonCancel, maxX / 2 - 25, maxY / 2 - 2, maxX / 2 - 5, maxY / 2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
+	v, err = g.SetView(inputDuoLayout_buttonOk, maxX / 2 + 5, maxY / 2 - 2, maxX / 2 + 25, maxY / 2, byte(0))
+	if err != nil && err != gocui.ErrUnknownView {
+		return err
+	}
+	v.Highlight = false
+	v.Frame = true
+	v.Visible = false
+	app.Views = append(app.Views, v)
+
 	// Input multiple layots
 	v, err = g.SetView(inputEmailPasswordLayout, maxX / 2 - 30, maxY / 2 - 10, maxX / 2 + 30, maxY / 2 + 1, byte(0))
 	if err != nil && err != gocui.ErrUnknownView {
